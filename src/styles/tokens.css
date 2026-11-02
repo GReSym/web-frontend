@@ -1,0 +1,80 @@
+/* Design tokens. Sizes are in rem (1rem = 16px at the default font size) so the UI scales with the browser settings. */
+:root {
+  color-scheme: light;
+
+  --c-bg: #ffffff;
+  --c-surface: #f1f3f6; /* section panels (light gray in the wireframes) */
+  --c-surface-2: #e2e6eb; /* blocks inside panels, inputs, image placeholders */
+  --c-surface-3: #d2d8df;
+  --c-header: #1d2330;
+  --c-header-text: #f4f6fa;
+  --c-text: #1b1f27;
+  --c-text-muted: #5c6573;
+  --c-border: #cfd5dd;
+  --c-accent: #3a6ee8;
+  --c-accent-hover: #2b5bcc;
+  --c-accent-text: #ffffff;
+  --c-accent-soft: #e3ebfd;
+  --c-positive: #2f9e5a;
+  --c-positive-soft: #ddf3e5;
+  --c-negative: #d14b4b;
+  --c-negative-soft: #fbe3e3;
+  --c-warning: #b7791f;
+  --c-warning-soft: #fdf1dc;
+  --c-tag: #e6eaf0;
+  --c-tag-text: #39424f;
+  --c-overlay: rgb(10 12 18 / 0.75);
+  --c-focus: #7ea2f5;
+  --shadow-pop: 0 0.5rem 1.5rem rgb(15 20 30 / 0.18);
+
+  --sp-1: 0.5rem; /* 8px */
+  --sp-2: 1rem; /* 16px */
+  --sp-3: 1.5rem; /* 24px */
+  --sp-4: 2rem; /* 32px */
+  --sp-5: 2.75rem; /* ~44px, section separation */
+
+  --radius: 0.375rem;
+  --radius-lg: 0.625rem;
+  --control-h: 2.375rem; /* ~38px */
+  --header-h: 3.25rem; /* 52px */
+
+  --w-home: 75rem;
+  --w-admin: 52.5rem;
+  --w-search: 58.75rem;
+  --w-game: 60rem;
+  --w-profile: 42.5rem;
+  --w-recs: 57.5rem;
+  --w-auth: 20rem;
+
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  --font-mono: ui-monospace, 'JetBrains Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  --c-bg: #12151b;
+  --c-surface: #1b2029;
+  --c-surface-2: #252b36;
+  --c-surface-3: #313846;
+  --c-header: #0b0e13;
+  --c-header-text: #e9edf3;
+  --c-text: #e4e8ee;
+  --c-text-muted: #98a2b2;
+  --c-border: #333b48;
+  --c-accent: #5b8cff;
+  --c-accent-hover: #7aa2ff;
+  --c-accent-text: #0b0e13;
+  --c-accent-soft: #1f2c4a;
+  --c-positive: #4cc27a;
+  --c-positive-soft: #193526;
+  --c-negative: #ef6b6b;
+  --c-negative-soft: #3d1f22;
+  --c-warning: #e0a84a;
+  --c-warning-soft: #3a2e17;
+  --c-tag: #2a313d;
+  --c-tag-text: #c5ccd8;
+  --c-overlay: rgb(0 0 0 / 0.8);
+  --c-focus: #5b8cff;
+  --shadow-pop: 0 0.5rem 1.5rem rgb(0 0 0 / 0.5);
+}

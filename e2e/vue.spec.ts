@@ -1,8 +1,13 @@
 import { test, expect } from '@playwright/test'
 
-// See here how to get started:
-// https://playwright.dev/docs/intro
-test('visits the app root url', async ({ page }) => {
+// Needs only the dev server: API failures show up as error states, the layout still renders.
+test('home page shows the header and sections', async ({ page }) => {
   await page.goto('/')
-  await expect(page.locator('h1')).toHaveText('You did it!')
+  await expect(page.getByRole('link', { name: /GReSym/ }).first()).toBeVisible()
+  await expect(page.getByRole('search').first()).toBeVisible()
+})
+
+test('protected pages redirect guests to login', async ({ page }) => {
+  await page.goto('/profile')
+  await expect(page).toHaveURL(/\/login\?redirect=/)
 })
