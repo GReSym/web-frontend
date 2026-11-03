@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useId, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDebounceFn } from '@vueuse/core'
 import { gameService } from '@/services/gameService'
@@ -18,6 +18,7 @@ const results = ref<GameInfo[]>([])
 const loading = ref(false)
 const failed = ref(false)
 const open = ref(false)
+const rootEl = ref<HTMLElement | null>(null)
 const active = ref(-1)
 let controller: AbortController | null = null
 
@@ -84,15 +85,21 @@ function onKeydown(e: KeyboardEvent) {
   }
 }
 
-// The dropdown closes when focus leaves the search (clicking a result keeps focus inside: links are focusable)
-function onFocusOut(e: FocusEvent) {
-  const container = e.currentTarget as HTMLElement
-  if (!container.contains(e.relatedTarget as Node | null)) open.value = false
+// Close on tap/click anywhere outside the search container.
+// Using pointerdown so it also works on iOS Safari without relying on focus/blur ordering.
+function onDocPointerDown(e: PointerEvent) {
+  if (!open.value) return
+  const root = rootEl.value
+  if (root && !root.contains(e.target as Node)) open.value = false
 }
+window.addEventListener('pointerdown', onDocPointerDown, true)
+onBeforeUnmount(() => {
+  window.removeEventListener('pointerdown', onDocPointerDown, true)
+})
 </script>
 
 <template>
-  <form class="search" role="search" @submit.prevent="submit" @focusout="onFocusOut">
+  <form ref="rootEl" class="search" role="search" @submit.prevent="submit">
     <div class="row">
       <input
         v-model="query"
@@ -123,7 +130,8 @@ function onFocusOut(e: FocusEvent) {
         :class="{ active: i === active }"
         role="option"
         :aria-selected="i === active"
-        @click.prevent="openGame(game.gameId)"
+        @pointerdown.prevent="openGame(game.gameId)"
+        @click.prevent
       >
         <SteamImage :src="game.headerImageUrl" :alt="game.title" class="thumb" />
         <span class="info">
