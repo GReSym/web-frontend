@@ -278,6 +278,31 @@ const ru: typeof en = {
     staleEmpty: 'Нажмите «Обновить список», чтобы найти игры с устаревшими векторами.',
     staleSummary: 'Устаревших игр: {total} (показано {shown}); векторов {vectors} на {games} игр.',
     back: 'Назад в панель администратора',
+    media: {
+      title: 'Картинки',
+      baseUrl: 'Базовый URL медиа',
+      baseUrlHint:
+        'Шлюз Openinary, с которого отдаются сохранённые картинки (http(s)-URL или путь вида /cdn). Пусто — по умолчанию: {def}',
+      saved: 'Базовый URL медиа сохранён.',
+      stats: 'На CDN Steam',
+      headersOnSteam: 'Обложки: {n} из {total}',
+      screenshotsOnSteam: 'Скриншоты: {n} из {total}',
+      migration: 'Перенос картинок в Openinary',
+      limit: 'Игр',
+      includeScreenshots: 'И скриншоты (~7 на игру, ~2 МБ)',
+      start: 'Запустить',
+      migrationHint:
+        'Сначала самые популярные игры. Идёт в фоне, по одному запуску; игры, чьих картинок уже нет в Steam, остаются со ссылкой на Steam.',
+      progress:
+        'Игр: {games} из {limit}, перенесено обложек: {headers}, скриншотов: {screenshots}, ошибок: {failed}',
+      state: {
+        idle: 'Не запускался',
+        running: 'Идёт',
+        completed: 'Завершён',
+        cancelled: 'Остановлен',
+        failed: 'Ошибка',
+      },
+    },
   },
   evaluation: {
     title: 'Оценка #{id}',

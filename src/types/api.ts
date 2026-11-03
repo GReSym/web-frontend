@@ -210,3 +210,51 @@ export interface PageQuery {
   page: number
   limit: number
 }
+
+/** GET /api/config: what every page needs. */
+export interface PublicConfig {
+  /** Base URL for stored image paths, no trailing slash; "" = not configured. */
+  mediaBaseUrl: string
+}
+
+export interface AppSettings {
+  mediaBaseUrl: string
+  /** From the API's appsettings, used while the admin never set one. */
+  defaultMediaBaseUrl: string
+}
+
+/** Partial update; mediaBaseUrl "" = back to the default. */
+export interface UpdateAppSettingsRequest {
+  mediaBaseUrl?: string
+}
+
+/** How many image references still point at the Steam CDN. */
+export interface MediaStats {
+  headers: number
+  steamHeaders: number
+  screenshots: number
+  steamScreenshots: number
+}
+
+export type MediaMigrationState = 'idle' | 'running' | 'completed' | 'cancelled' | 'failed'
+
+/** The current or last migration run (in the API's memory: a restart forgets it). */
+export interface MediaMigrationStatus {
+  state: MediaMigrationState
+  startedAt?: string | null
+  finishedAt?: string | null
+  limit: number
+  includeScreenshots: boolean
+  gamesProcessed: number
+  gamesFailed: number
+  headersMigrated: number
+  screenshotsMigrated: number
+  filesFailed: number
+  error?: string | null
+}
+
+export interface StartMediaMigrationRequest {
+  gameIds?: number[]
+  limit: number
+  includeScreenshots: boolean
+}

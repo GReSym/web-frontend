@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import InfiniteSentinel from '@/components/common/InfiniteSentinel.vue'
-import { screenshotFull, screenshotThumb } from '@/utils/steam'
+import { useConfigStore } from '@/stores/config'
 
-// Horizontal gallery. Screenshots come from the Steam CDN, so only a few small thumbnails (600×338) are put on the
-// page at first and more are added when the user scrolls to the end; the full-size image is requested only in the
-// expanded view, one at a time.
+// Horizontal gallery. Only a few small thumbnails (600×338) are put on the page at first and more are added when the
+// user scrolls to the end; the full-size image is requested only in the expanded view, one at a time. `urls` are
+// image references (Steam URLs or media store paths, see utils/media.ts).
 
 const props = withDefaults(defineProps<{ urls: string[]; title: string; batch?: number }>(), {
   batch: 4,
 })
+
+const config = useConfigStore()
 
 const shown = ref(props.batch)
 const scroller = ref<HTMLElement | null>(null)
@@ -88,7 +90,7 @@ onBeforeUnmount(() => {
         @click="open(i)"
       >
         <img
-          :src="screenshotThumb(url)"
+          :src="config.imageUrl(url, 'thumb') ?? undefined"
           :alt="$t('game.screenshotAlt', { title, n: i + 1 })"
           loading="lazy"
           decoding="async"
@@ -137,7 +139,7 @@ onBeforeUnmount(() => {
       </button>
       <img
         :key="urls[current]"
-        :src="screenshotFull(urls[current]!)"
+        :src="config.imageUrl(urls[current], 'full') ?? undefined"
         :alt="$t('game.screenshotAlt', { title, n: current + 1 })"
         referrerpolicy="no-referrer"
         decoding="async"

@@ -278,6 +278,31 @@ export default {
     staleEmpty: 'Click “Update list” to find games whose vectors are out of date.',
     staleSummary: '{total} stale games (showing {shown}); {vectors} vectors for {games} games.',
     back: 'Back to the admin page',
+    media: {
+      title: 'Images',
+      baseUrl: 'Media base URL',
+      baseUrlHint:
+        'Openinary media gateway that stored image paths are served from (an http(s) URL or a path such as /cdn). Empty = default: {def}',
+      saved: 'Media base URL saved.',
+      stats: 'On the Steam CDN',
+      headersOnSteam: 'Headers: {n} of {total}',
+      screenshotsOnSteam: 'Screenshots: {n} of {total}',
+      migration: 'Move images to Openinary',
+      limit: 'Games',
+      includeScreenshots: 'Screenshots too (~7 per game, ~2 MB)',
+      start: 'Start',
+      migrationHint:
+        'Most popular games first. Runs in the background, one run at a time; games whose images are gone from Steam keep the Steam URL.',
+      progress:
+        '{games} of {limit} games, {headers} headers and {screenshots} screenshots moved, {failed} games failed',
+      state: {
+        idle: 'Idle',
+        running: 'Running',
+        completed: 'Completed',
+        cancelled: 'Cancelled',
+        failed: 'Failed',
+      },
+    },
   },
   evaluation: {
     title: 'Evaluation #{id}',

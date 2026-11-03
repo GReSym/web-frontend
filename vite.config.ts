@@ -14,11 +14,17 @@ export default defineConfig(({ mode }) => {
     // Разрешаем принимать запросы со случайных поддоменов туннелей (ngrok, localtunnel и др.)
     allowedHosts: true,
 
-    // Проксирование API
+    // Проксирование API и картинок (шлюз Openinary из deploy/): при базовом URL медиа "/cdn" всё идёт через один
+    // origin, поэтому для демо через туннель достаточно открыть наружу только этот сервер
     proxy: {
       '/api': {
         target: env.VITE_API_PROXY_TARGET || 'http://localhost:5147',
         changeOrigin: true,
+      },
+      '/cdn': {
+        target: env.VITE_MEDIA_PROXY_TARGET || 'http://localhost:8090',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/cdn/, ''),
       },
     },
   }

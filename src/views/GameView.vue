@@ -9,7 +9,7 @@ import { ApiError, isAbortError } from '@/services/api'
 import { developerLine, formatDate } from '@/utils/format'
 import { sanitizeDescription } from '@/utils/sanitize'
 import { steamStoreUrl } from '@/utils/steam'
-import SteamImage from '@/components/common/SteamImage.vue'
+import MediaImage from '@/components/common/MediaImage.vue'
 import GameTags from '@/components/games/GameTags.vue'
 import GameScreenshots from '@/components/games/GameScreenshots.vue'
 import GameReviews from '@/components/games/GameReviews.vue'
@@ -114,7 +114,7 @@ const libraryLabel = computed(() => (entry.value ? t('game.inLibrary') : t('game
     <template v-else-if="game">
       <section class="info" aria-labelledby="game-title">
         <div class="left">
-          <SteamImage :src="game.headerImageUrl" :alt="game.title" class="cover" />
+          <MediaImage :src="game.headerImageUrl" :alt="game.title" class="cover" />
           <GameTags :tags="game.tags" :max="16" />
         </div>
 

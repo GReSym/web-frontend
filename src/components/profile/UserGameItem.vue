@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
-import SteamImage from '@/components/common/SteamImage.vue'
+import MediaImage from '@/components/common/MediaImage.vue'
 import RecommendToggle from '@/components/common/RecommendToggle.vue'
 import RatingSelect from '@/components/common/RatingSelect.vue'
 import { developerLine, formatDate } from '@/utils/format'
@@ -53,7 +53,7 @@ async function onSaveComment() {
   <article class="item" :class="{ dirty }">
     <div class="main">
       <RouterLink :to="to" class="image-link" :aria-label="game?.title">
-        <SteamImage :src="game?.headerImageUrl" :alt="game?.title ?? `#${entry.gameId}`" />
+        <MediaImage :src="game?.headerImageUrl" :alt="game?.title ?? `#${entry.gameId}`" />
       </RouterLink>
 
       <div class="info">

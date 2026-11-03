@@ -5,6 +5,7 @@ import { adminService } from '@/services/adminService'
 import { isAbortError } from '@/services/api'
 import EvaluationSummary from '@/components/admin/EvaluationSummary.vue'
 import StaleGamesPanel from '@/components/admin/StaleGamesPanel.vue'
+import MediaPanel from '@/components/admin/MediaPanel.vue'
 import PaginationControls from '@/components/common/PaginationControls.vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
@@ -76,6 +77,8 @@ function goTo(next: number) {
     </section>
 
     <StaleGamesPanel />
+
+    <MediaPanel />
   </div>
 </template>
 

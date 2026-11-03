@@ -5,7 +5,7 @@ import { useDebounceFn } from '@vueuse/core'
 import { gameService } from '@/services/gameService'
 import { isAbortError } from '@/services/api'
 import { developerLine } from '@/utils/format'
-import SteamImage from '@/components/common/SteamImage.vue'
+import MediaImage from '@/components/common/MediaImage.vue'
 import type { GameInfo } from '@/types/api'
 
 // Header search: quick exact-title search (top 3) in a dropdown while typing; Enter / Go! opens Advanced Search.
@@ -133,7 +133,7 @@ onBeforeUnmount(() => {
         @pointerdown.prevent="openGame(game.gameId)"
         @click.prevent
       >
-        <SteamImage :src="game.headerImageUrl" :alt="game.title" class="thumb" />
+        <MediaImage :src="game.headerImageUrl" :alt="game.title" class="thumb" />
         <span class="info">
           <span class="title">{{ game.title }}</span>
           <span class="dev">{{ developerLine(game.developer, game.publisher) }}</span>

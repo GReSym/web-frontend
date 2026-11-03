@@ -1,10 +1,15 @@
 import { request } from './api'
 import type {
+  AppSettings,
   EvaluationRun,
   EvaluationRunsList,
   GameInfo,
+  MediaMigrationStatus,
+  MediaStats,
   PageQuery,
   StaleReport,
+  StartMediaMigrationRequest,
+  UpdateAppSettingsRequest,
   UpdateGameRequest,
 } from '@/types/api'
 
@@ -20,4 +25,14 @@ export const adminService = {
     q: { limit?: number; offset?: number; reason?: string[] } = {},
     signal?: AbortSignal,
   ) => request<StaleReport>('/admin/vectorization/stale', { query: q, signal }),
+  settings: (signal?: AbortSignal) => request<AppSettings>('/admin/settings', { signal }),
+  updateSettings: (body: UpdateAppSettingsRequest) =>
+    request<AppSettings>('/admin/settings', { method: 'PATCH', body }),
+  /** Counts over every game and screenshot (a second or two). */
+  mediaStats: (signal?: AbortSignal) => request<MediaStats>('/admin/media/stats', { signal }),
+  mediaMigration: (signal?: AbortSignal) =>
+    request<MediaMigrationStatus>('/admin/media/migration', { signal }),
+  startMediaMigration: (body: StartMediaMigrationRequest) =>
+    request<MediaMigrationStatus>('/admin/media/migration', { method: 'POST', body }),
+  cancelMediaMigration: () => request<void>('/admin/media/migration', { method: 'DELETE' }),
 }

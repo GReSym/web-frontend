@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import SteamImage from '@/components/common/SteamImage.vue'
+import MediaImage from '@/components/common/MediaImage.vue'
 import GameTags from './GameTags.vue'
 import { developerLine, formatDate, formatNumber } from '@/utils/format'
 import type { GameInfo } from '@/types/api'
@@ -36,7 +36,7 @@ const scoreText = computed(() =>
 <template>
   <article v-if="variant === 'compact'" class="card compact">
     <RouterLink :to="to" class="image-link" :aria-label="game.title">
-      <SteamImage :src="game.headerImageUrl" :alt="game.title" />
+      <MediaImage :src="game.headerImageUrl" :alt="game.title" />
     </RouterLink>
     <div class="compact-info">
       <RouterLink :to="to" class="title" :title="game.title">{{ game.title }}</RouterLink>
@@ -47,7 +47,7 @@ const scoreText = computed(() =>
 
   <article v-else class="card row">
     <RouterLink :to="to" class="image-link" :aria-label="game.title">
-      <SteamImage :src="game.headerImageUrl" :alt="game.title" />
+      <MediaImage :src="game.headerImageUrl" :alt="game.title" />
     </RouterLink>
     <div class="row-info">
       <RouterLink :to="to" class="title big" :title="game.title">{{ game.title }}</RouterLink>
