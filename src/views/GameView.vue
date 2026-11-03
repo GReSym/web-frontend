@@ -5,6 +5,9 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { gameService } from '@/services/gameService'
 import { ratingService } from '@/services/ratingService'
+import { gameListService } from '@/services/gameListService'
+import { useToast } from '@/composables/useToast'
+import { useErrorMessage } from '@/composables/useErrorMessage'
 import { ApiError, isAbortError } from '@/services/api'
 import { developerLine, formatDate } from '@/utils/format'
 import { sanitizeDescription } from '@/utils/sanitize'
@@ -18,13 +21,15 @@ import EditGameModal from '@/components/games/EditGameModal.vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
-import type { GameInfo, GameRating } from '@/types/api'
+import type { GameInfo, GameListEntry, GameListStatus, GameRating } from '@/types/api'
 
 const props = defineProps<{ id: number }>()
 
 const { locale, t } = useI18n()
 const auth = useAuthStore()
 const router = useRouter()
+const toast = useToast()
+const errorMessage = useErrorMessage()
 
 const game = shallowRef<GameInfo | null>(null)
 const loading = ref(false)
@@ -33,6 +38,9 @@ const notFound = ref(false)
 /** The user's library entry for this game (null = not in the library, undefined = unknown / guest) */
 const entry = shallowRef<GameRating | null | undefined>(undefined)
 const libraryOpen = ref(false)
+/** Planned / rejected list entry (null = in neither list, undefined = unknown / guest) */
+const listEntry = shallowRef<GameListEntry | null | undefined>(undefined)
+const listSaving = ref(false)
 /** Long Steam descriptions (with images/GIFs) start collapsed; clipped images aren't loaded until expanded */
 const descriptionOpen = ref(false)
 const editOpen = ref(false)
@@ -47,12 +55,19 @@ async function load() {
   notFound.value = false
   game.value = null
   entry.value = undefined
+  listEntry.value = undefined
   descriptionOpen.value = false
   try {
     game.value = await gameService.get(props.id, own.signal)
     document.title = `${game.value.title} — GReSym`
-    if (auth.isAuthenticated)
-      entry.value = await ratingService.get(props.id, own.signal).catch(() => undefined)
+    if (auth.isAuthenticated) {
+      const [rating, listed] = await Promise.all([
+        ratingService.get(props.id, own.signal).catch(() => undefined),
+        gameListService.get(props.id, own.signal).catch(() => undefined),
+      ])
+      entry.value = rating
+      listEntry.value = listed
+    }
   } catch (e) {
     if (isAbortError(e)) return
     // The API answers 400 for an unknown game id
@@ -101,6 +116,38 @@ function onEdited(updated: GameInfo) {
 }
 
 const libraryLabel = computed(() => (entry.value ? t('game.inLibrary') : t('game.addToLibrary')))
+
+/** A rated game left the lists (the API removes it): the list buttons only make sense for unrated games */
+const rated = computed(
+  () => entry.value != null && (entry.value.rating != null || entry.value.recommend != null),
+)
+const showListButtons = computed(
+  () => auth.isAuthenticated && listEntry.value !== undefined && !rated.value,
+)
+
+/** Clicking the active list removes the game from it */
+async function toggleList(status: GameListStatus) {
+  if (listSaving.value) return
+  listSaving.value = true
+  try {
+    if (listEntry.value?.status === status) {
+      await gameListService.remove(props.id)
+      listEntry.value = null
+    } else {
+      listEntry.value = await gameListService.set(props.id, status)
+    }
+  } catch (e) {
+    toast.error(errorMessage(e))
+  } finally {
+    listSaving.value = false
+  }
+}
+
+/** null = removed from the library */
+function onLibrarySaved(saved: GameRating | null) {
+  entry.value = saved
+  if (saved && (saved.rating != null || saved.recommend != null)) listEntry.value = null
+}
 </script>
 
 <template>
@@ -143,6 +190,36 @@ const libraryLabel = computed(() => (entry.value ? t('game.inLibrary') : t('game
               >
                 {{ libraryLabel }}
               </button>
+              <template v-if="showListButtons">
+                <button
+                  type="button"
+                  class="btn"
+                  :class="listEntry?.status === 'planned' ? 'btn-positive' : 'btn-ghost'"
+                  :aria-pressed="listEntry?.status === 'planned'"
+                  :title="$t('game.plannedHint')"
+                  :disabled="listSaving"
+                  @click="toggleList('planned')"
+                >
+                  {{
+                    listEntry?.status === 'planned' ? $t('game.inPlanned') : $t('game.addToPlanned')
+                  }}
+                </button>
+                <button
+                  type="button"
+                  class="btn"
+                  :class="listEntry?.status === 'rejected' ? 'btn-negative' : 'btn-ghost'"
+                  :aria-pressed="listEntry?.status === 'rejected'"
+                  :title="$t('game.rejectedHint')"
+                  :disabled="listSaving"
+                  @click="toggleList('rejected')"
+                >
+                  {{
+                    listEntry?.status === 'rejected'
+                      ? $t('game.inRejected')
+                      : $t('game.addToRejected')
+                  }}
+                </button>
+              </template>
               <button
                 v-if="auth.isAdmin"
                 type="button"
@@ -192,7 +269,7 @@ const libraryLabel = computed(() => (entry.value ? t('game.inLibrary') : t('game
         :game-id="game.gameId"
         :title="game.title"
         @close="libraryOpen = false"
-        @saved="entry = $event"
+        @saved="onLibrarySaved"
       />
       <EditGameModal
         v-if="auth.isAdmin"

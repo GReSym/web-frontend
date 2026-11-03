@@ -40,6 +40,9 @@ function logout() {
         <RouterLink class="entry" role="menuitem" :to="{ name: 'profile' }">{{
           $t('nav.profile')
         }}</RouterLink>
+        <RouterLink class="entry" role="menuitem" :to="{ name: 'lists' }">{{
+          $t('nav.lists')
+        }}</RouterLink>
         <RouterLink v-if="auth.isAdmin" class="entry" role="menuitem" :to="{ name: 'admin' }">
           {{ $t('nav.admin') }}
         </RouterLink>

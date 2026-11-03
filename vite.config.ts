@@ -1,6 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type CommonServerOptions } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -9,8 +9,9 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
-  // Общие настройки прокси и хостов для обоих режимов
-  const sharedServerConfig = {
+  // Общие настройки прокси и хостов для обоих режимов. Тип нужен явно: иначе `allowedHosts: true` расширяется до boolean,
+  // а Vite принимает только `true | string[]`
+  const sharedServerConfig: CommonServerOptions = {
     // Разрешаем принимать запросы со случайных поддоменов туннелей (ngrok, localtunnel и др.)
     allowedHosts: true,
 
@@ -31,15 +32,15 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [vue(), vueJsx(), vueDevTools()],
-                            resolve: {
-                              alias: {
-                                '@': fileURLToPath(new URL('./src', import.meta.url)),
-                              },
-                            },
-                            // Настройки для npm run dev
-                            server: sharedServerConfig,
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    },
+    // Настройки для npm run dev
+    server: sharedServerConfig,
 
-                            // Настройки для npm run preview (теперь прокси и ngrok заработают здесь)
-                            preview: sharedServerConfig,
+    // Настройки для npm run preview (теперь прокси и ngrok заработают здесь)
+    preview: sharedServerConfig,
   }
 })

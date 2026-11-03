@@ -31,6 +31,7 @@ export default {
   },
   nav: {
     profile: 'Profile',
+    lists: 'Planned and rejected',
     admin: 'Go to admin page',
     logout: 'Log out',
     login: 'Log in',
@@ -119,6 +120,12 @@ export default {
     steamPage: 'Steam store page',
     addToLibrary: 'Add to my games',
     inLibrary: 'In my games ✓',
+    addToPlanned: 'Plan to play',
+    inPlanned: 'Planned ✓',
+    plannedHint: 'Planned games count as a light like and are no longer recommended',
+    addToRejected: 'Not interested',
+    inRejected: 'Rejected ✓',
+    rejectedHint: 'Rejected games are no longer recommended',
     editInfo: 'Edit info',
     noDescription: 'No description.',
     expandDescription: 'Show the full description',
@@ -258,7 +265,7 @@ export default {
     queued: 'Waiting for the recommendation service…',
     queuedLong:
       'The recommendation service is busy or offline; the request is waiting in the queue.',
-    personal: 'Based on {n} of your rated games',
+    personal: 'Based on {n} of your games (rated, planned and rejected)',
     popularFallback:
       'Popular games (not enough ratings yet, or the recommendation service was unavailable)',
     fallbackReason: 'Popular games were used instead: {error}',
@@ -266,8 +273,27 @@ export default {
     score: 'Score',
     popularNoScore: 'Popular pick',
     goodPick: 'Good pick?',
-    goodPickYes: 'Good recommendation',
-    goodPickNo: 'Bad recommendation',
+    goodPickYes: 'Good recommendation: adds the game to Planned',
+    goodPickNo: 'Bad recommendation: adds the game to Rejected',
+    goodPickNeutral: 'No opinion',
+    feedbackFor: 'Your opinion about {title}',
+  },
+  lists: {
+    title: 'Planned and rejected games',
+    intro:
+      'Liking a recommendation plans the game, disliking it rejects it. Games in these lists are not recommended again, and they gently steer your next recommendations. Rating a game in your library takes it off the list.',
+    remove: 'Remove',
+    removeFrom: 'Remove {title} from the list',
+    planned: {
+      title: 'Planned',
+      hint: 'Games you want to play. They count as a light like.',
+      empty: 'No planned games yet. Like a recommendation or plan a game on its page.',
+    },
+    rejected: {
+      title: 'Rejected',
+      hint: 'Games you are not interested in. They count as a light dislike if your dislike setting uses dislikes.',
+      empty: 'No rejected games.',
+    },
   },
   admin: {
     evaluations: 'Evaluations',

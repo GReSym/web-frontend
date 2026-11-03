@@ -59,13 +59,15 @@ const statusText = computed(() => {
 })
 const finishedAt = computed(() => formatDateTime(run.result.value?.finishedAt, locale.value))
 
-// Feedback on single recommended games (stored by the API for later evaluation)
+// Feedback on single recommended games: the API also puts liked games in "planned" and disliked ones in "rejected"
+// (weak likes / dislikes, never recommended again). `null` = the neutral "–" button: clears the feedback.
 const feedback = ref(new Map<number, boolean | null>())
-async function sendFeedback(game: RecommendedGame, liked: boolean) {
+async function sendFeedback(game: RecommendedGame, liked: boolean | null) {
   const rec = run.result.value
   if (!rec) return
-  const current = feedback.value.has(game.gameId) ? feedback.value.get(game.gameId) : game.liked
+  const current = likedOf(game) ?? null
   const next = current === liked ? null : liked
+  if (next === current) return
   feedback.value.set(game.gameId, next)
   try {
     await recommendationService.feedback(rec.id, game.gameId, next)
@@ -148,7 +150,11 @@ function likedOf(game: RecommendedGame) {
             :score="game.score"
           >
             <template #actions>
-              <div class="feedback">
+              <div
+                class="feedback"
+                role="group"
+                :aria-label="$t('recommendations.feedbackFor', { title: game.title })"
+              >
                 <span class="small muted">{{ $t('recommendations.goodPick') }}</span>
                 <button
                   type="button"
@@ -159,6 +165,16 @@ function likedOf(game: RecommendedGame) {
                   @click="sendFeedback(game, true)"
                 >
                   👍
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-ghost neutral"
+                  :class="{ selected: likedOf(game) == null }"
+                  :aria-pressed="likedOf(game) == null"
+                  :title="$t('recommendations.goodPickNeutral')"
+                  @click="sendFeedback(game, null)"
+                >
+                  –
                 </button>
                 <button
                   type="button"
@@ -226,5 +242,14 @@ function likedOf(game: RecommendedGame) {
   align-items: center;
   gap: 0.375rem;
   margin-top: 0.5rem;
+}
+/* "No opinion": does nothing on its own, only shows that the game isn't rated (selected by default) */
+.neutral {
+  min-width: 2.25rem;
+  color: var(--c-text-muted);
+}
+.neutral.selected {
+  background: var(--c-surface-2);
+  border-color: var(--c-border);
 }
 </style>

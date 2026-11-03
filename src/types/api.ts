@@ -69,6 +69,23 @@ export interface GameRatingsList {
   ratings: GameRating[]
 }
 
+/** The user's lists: planned = wants to play it, rejected = not interested. Both are never recommended again. */
+export type GameListStatus = 'planned' | 'rejected'
+
+export interface GameListEntry {
+  gameId: number
+  status: GameListStatus
+  /** ISO date: when the game was put in this list */
+  addedAt: string
+  /** only in lists */
+  game?: GameInfo
+}
+
+export interface GameListPage {
+  count: number
+  games: GameListEntry[]
+}
+
 export interface GameReview {
   id: number
   source: string
