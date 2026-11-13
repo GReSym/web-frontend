@@ -9,6 +9,7 @@ import MediaImage from '@/components/common/MediaImage.vue'
 import type { GameInfo } from '@/types/api'
 
 // Header search: quick exact-title search (top 3) in a dropdown while typing; Enter / Go! opens Advanced Search.
+// The dropdown footer also offers the search by meaning (users didn't notice it on the search page alone).
 
 const router = useRouter()
 const listId = useId()
@@ -63,6 +64,11 @@ function submit() {
   }
   open.value = false
   router.push({ name: 'search', query: trimmed.value ? { q: trimmed.value } : {} })
+}
+
+function searchByMeaning() {
+  open.value = false
+  router.push({ name: 'search', query: { q: trimmed.value, exact: '0' } })
 }
 
 function openGame(id: number) {
@@ -134,12 +140,17 @@ onBeforeUnmount(() => {
         @click.prevent
       >
         <MediaImage :src="game.headerImageUrl" :alt="game.title" class="thumb" />
-        <span class="info">
+        <span class="info" translate="no">
           <span class="title">{{ game.title }}</span>
           <span class="dev">{{ developerLine(game.developer, game.publisher) }}</span>
         </span>
       </RouterLink>
-      <button type="submit" class="all">{{ $t('header.allResults', { q: trimmed }) }}</button>
+      <div class="footer">
+        <button type="submit" class="foot-btn">{{ $t('header.allResults') }}</button>
+        <button type="button" class="foot-btn meaning" @click="searchByMeaning">
+          {{ $t('header.byMeaning') }}
+        </button>
+      </div>
     </div>
   </form>
 </template>
@@ -215,16 +226,31 @@ onBeforeUnmount(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.all {
+.footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   margin-top: 0.25rem;
+  border-top: 1px solid var(--c-border);
+}
+.foot-btn {
   padding: 0.5rem;
   border: 0;
-  border-top: 1px solid var(--c-border);
+  border-radius: var(--radius);
   background: none;
   color: var(--c-accent);
   font: inherit;
   font-size: 0.875rem;
-  text-align: left;
+  font-weight: 600;
   cursor: pointer;
+}
+.foot-btn:hover {
+  background: var(--c-surface);
+}
+.meaning {
+  border-left: 1px solid var(--c-border);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.meaning::before {
+  content: '✨ ';
 }
 </style>

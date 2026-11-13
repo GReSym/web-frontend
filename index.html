@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
@@ -7,6 +7,15 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>GReSym</title>
     <script>
+      // Set the UI language before anything else: browsers decide on offering translation from the initial
+      // document, so a static lang that differs from the UI makes them offer ru→en on a Russian page.
+      // Same logic as initialLocale() in src/i18n/index.ts.
+      try {
+        var locale = localStorage.getItem('gresym-locale')
+        if (locale !== 'ru' && locale !== 'en')
+          locale = (navigator.language || '').toLowerCase().indexOf('ru') === 0 ? 'ru' : 'en'
+        document.documentElement.lang = locale
+      } catch (e) {}
       // Apply the saved theme before the first paint (no light flash in dark mode)
       try {
         var mode = localStorage.getItem('gresym-theme') || 'auto'

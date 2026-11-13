@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useTheme } from '@/composables/useTheme'
-import { setLocale, type AppLocale } from '@/i18n'
+import { LOCALES, setLocale } from '@/i18n'
 import SearchBar from './SearchBar.vue'
 import UserDropdown from './UserDropdown.vue'
 
@@ -16,9 +16,8 @@ const themeIcon = computed(
 )
 const themeLabel = computed(() => t('header.theme', { mode: t(`header.themeModes.${mode.value}`) }))
 
-function toggleLocale() {
-  setLocale((locale.value === 'en' ? 'ru' : 'en') as AppLocale)
-}
+// RU / EN as two buttons, the current one highlighted: a single toggle showing the *other* language confused users
+const localeButtons = [...LOCALES].sort((a) => (a === 'ru' ? -1 : 1))
 </script>
 
 <template>
@@ -44,15 +43,20 @@ function toggleLocale() {
       >
         {{ themeIcon }}
       </button>
-      <button
-        type="button"
-        class="tool lang"
-        :title="$t('header.language')"
-        :aria-label="$t('header.language')"
-        @click="toggleLocale"
-      >
-        {{ locale === 'en' ? 'RU' : 'EN' }}
-      </button>
+      <div class="lang" role="group" :aria-label="$t('header.language')">
+        <button
+          v-for="code in localeButtons"
+          :key="code"
+          type="button"
+          class="lang-btn"
+          :class="{ active: locale === code }"
+          :aria-pressed="locale === code"
+          :lang="code"
+          @click="setLocale(code)"
+        >
+          {{ code.toUpperCase() }}
+        </button>
+      </div>
       <UserDropdown />
     </div>
   </header>
@@ -122,9 +126,34 @@ function toggleLocale() {
   font-size: 1.125rem;
   cursor: pointer;
 }
-.tool.lang {
+.lang {
+  display: flex;
+  padding: 0.125rem;
+  border-radius: var(--radius);
+  background: rgb(255 255 255 / 0.1);
+}
+.lang-btn {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.375rem;
+  border: 0;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--c-header-text);
+  opacity: 0.65;
+  font: inherit;
   font-size: 0.8125rem;
   font-weight: 700;
+  cursor: pointer;
+}
+.lang-btn:hover {
+  opacity: 1;
+}
+.lang-btn.active {
+  background: var(--c-accent);
+  color: var(--c-accent-text);
+  opacity: 1;
+  cursor: default;
 }
 .tool:hover {
   background: rgb(255 255 255 / 0.12);

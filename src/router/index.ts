@@ -23,6 +23,12 @@ const router = createRouter({
       props: (route) => ({ id: Number(route.params.id) }),
     },
     {
+      path: '/similar/:id(\\d+)',
+      name: 'similar',
+      component: () => import('@/views/SimilarView.vue'),
+      props: (route) => ({ id: Number(route.params.id) }),
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: () => import('@/views/ProfileView.vue'),
@@ -32,6 +38,14 @@ const router = createRouter({
       path: '/recommendations',
       name: 'recommendations',
       component: () => import('@/views/RecommendationsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      // Same view as /recommendations, showing (and polling) one stored recommendation
+      path: '/recommendations/:id(\\d+)',
+      name: 'recommendation',
+      component: () => import('@/views/RecommendationsView.vue'),
+      props: (route) => ({ id: Number(route.params.id) }),
       meta: { requiresAuth: true },
     },
     {

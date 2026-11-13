@@ -1,19 +1,24 @@
 import { onBeforeUnmount, ref, shallowRef } from 'vue'
 import { recommendationService } from '@/services/recommendationService'
 import { isAbortError } from '@/services/api'
-import type { CreateRecommendationRequest, Recommendation } from '@/types/api'
+import type { Recommendation } from '@/types/api'
 
 const POLL_START_MS = 1000
 const POLL_MAX_MS = 3000
 
 /**
- * Starts a recommendation calculation and polls it until the backend marks it completed.
+ * Loads a stored recommendation and polls it until the backend marks it completed.
+ * The page `/recommendations/:id` uses it, so a reload or coming back from a game page shows the same list
+ * (or keeps waiting for it) instead of calculating a new one.
  * The ML worker answers in ~0.3 s (the first run after a worker start ~6 s); while the worker is down the
  * request stays queued, so polling continues (slower) until the user leaves the page.
  */
 export function useRecommendationRun() {
+  /** Completed recommendation (with games) */
   const result = shallowRef<Recommendation | null>(null)
-  const status = ref<'idle' | 'starting' | 'queued' | 'completed' | 'failed'>('idle')
+  /** The latest response, also while queued: its parameters fill the params form */
+  const current = shallowRef<Recommendation | null>(null)
+  const status = ref<'idle' | 'loading' | 'queued' | 'completed' | 'failed'>('idle')
   const error = ref<unknown>(null)
   const waitedSeconds = ref(0)
 
@@ -32,7 +37,12 @@ export function useRecommendationRun() {
     controller = new AbortController()
     try {
       const rec = await recommendationService.get(id, controller.signal)
-      waitedSeconds.value = Math.round((Date.now() - startedAt) / 1000)
+      current.value = rec
+      // Measured from the recommendation's creation, so a reload doesn't reset the "taking long" hint
+      const created = Date.parse(rec.createdAt)
+      waitedSeconds.value = Math.round(
+        (Date.now() - (Number.isNaN(created) ? startedAt : Math.min(created, startedAt))) / 1000,
+      )
       if (rec.status === 'completed') {
         result.value = rec
         status.value = 'completed'
@@ -47,31 +57,19 @@ export function useRecommendationRun() {
     }
   }
 
-  async function start(request: CreateRecommendationRequest) {
+  /** Shows a stored recommendation, polling while it's still being calculated. */
+  async function show(id: number) {
     stop()
     error.value = null
     result.value = null
+    current.value = null
     waitedSeconds.value = 0
-    status.value = 'starting'
-    startedAt = Date.now()
-    try {
-      const created = await recommendationService.create(request)
-      // Completed right away when the popular-games fallback was used
-      await poll(created.id, POLL_START_MS)
-    } catch (e) {
-      error.value = e
-      status.value = 'failed'
-    }
-  }
-
-  /** Shows a stored recommendation (the latest one) without calculating a new one. */
-  async function show(id: number) {
-    stop()
+    status.value = 'loading'
     startedAt = Date.now()
     await poll(id, POLL_START_MS)
   }
 
   onBeforeUnmount(stop)
 
-  return { result, status, error, waitedSeconds, start, show, stop }
+  return { result, current, status, error, waitedSeconds, show, stop }
 }

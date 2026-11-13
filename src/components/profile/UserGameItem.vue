@@ -57,8 +57,10 @@ async function onSaveComment() {
       </RouterLink>
 
       <div class="info">
-        <RouterLink :to="to" class="title">{{ game?.title ?? `#${entry.gameId}` }}</RouterLink>
-        <span v-if="developer" class="muted small">{{ developer }}</span>
+        <RouterLink :to="to" class="title" translate="no">{{
+          game?.title ?? `#${entry.gameId}`
+        }}</RouterLink>
+        <span v-if="developer" class="muted small" translate="no">{{ developer }}</span>
         <span class="muted small">{{ released }}</span>
         <span v-if="dirty" class="unsaved small">
           {{ $t('library.unsaved') }}

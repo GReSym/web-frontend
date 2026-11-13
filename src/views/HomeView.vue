@@ -9,6 +9,7 @@ import { isAbortError } from '@/services/api'
 import { useToast } from '@/composables/useToast'
 import { useErrorMessage } from '@/composables/useErrorMessage'
 import GameCard from '@/components/games/GameCard.vue'
+import QuickGuide from '@/components/home/QuickGuide.vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
@@ -53,9 +54,11 @@ const popular = useSection<GameInfo>(
 )
 
 // The newest recommendation of the user (the list endpoint has no games, so it's fetched by id)
+const lastRecId = ref<number | null>(null)
 const lastRecs = useSection<GameInfo>(async (signal) => {
   const history = await recommendationService.history({ page: 1, limit: 5 }, signal)
   const latest = history.recommendations.find((r) => r.status === 'completed' && r.count > 0)
+  lastRecId.value = latest?.id ?? null
   if (!latest) return []
   const full = await recommendationService.get(latest.id, signal)
   return (full.games ?? []).slice(0, ROW)
@@ -111,6 +114,8 @@ async function evaluate(entry: GameRating, recommend: boolean) {
 
 <template>
   <div class="page home">
+    <QuickGuide />
+
     <section class="section" aria-labelledby="popular-h">
       <h2 id="popular-h">{{ $t('home.popular') }}</h2>
       <LoadingIndicator v-if="popular.loading.value && !popular.items.value.length" />
@@ -135,7 +140,15 @@ async function evaluate(entry: GameRating, recommend: boolean) {
       class="section"
       aria-labelledby="last-h"
     >
-      <h2 id="last-h">{{ $t('home.lastRecommendations') }}</h2>
+      <div class="section-head">
+        <h2 id="last-h">{{ $t('home.lastRecommendations') }}</h2>
+        <RouterLink
+          v-if="lastRecId"
+          :to="{ name: 'recommendation', params: { id: lastRecId } }"
+          class="small"
+          >{{ $t('home.openRecommendation') }} →</RouterLink
+        >
+      </div>
       <LoadingIndicator v-if="lastRecs.loading.value && !lastRecs.items.value.length" />
       <ErrorMessage
         v-else-if="lastRecs.error.value"

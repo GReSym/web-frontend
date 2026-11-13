@@ -26,6 +26,9 @@ export const gameService = {
   get: (id: number, signal?: AbortSignal) => request<GameInfo>(`/games/${id}`, { signal }),
   reviews: (id: number, q: PageQuery, signal?: AbortSignal) =>
     request<GameReviewsList>(`/games/${id}/reviews`, { query: { ...q }, signal }),
+  /** Most similar games by vector; 404 if the game has no vector yet, 503 if the ML service is down. */
+  similar: (id: number, limit: number, signal?: AbortSignal) =>
+    request<GamesList>(`/games/${id}/similar`, { query: { limit }, signal }),
   suggestTags: (search: string, limit = 10, signal?: AbortSignal) =>
     request<TagsList>('/tags', { query: { search, limit }, signal }),
 }

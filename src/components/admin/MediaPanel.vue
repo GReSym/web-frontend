@@ -83,7 +83,7 @@ async function poll() {
     if (isAbortError(e)) return
   }
   if (running.value) poller = setTimeout(poll, POLL_MS)
-  else if (wasRunning) loadStats()
+  else if (wasRunning && stats.value) loadStats()
 }
 
 async function start() {
@@ -109,9 +109,9 @@ async function cancel() {
   }
 }
 
+// Stats scan all games and screenshots, so they're only counted on request (the button), not on every visit
 onMounted(() => {
   loadSettings()
-  loadStats()
   poll()
 })
 onBeforeUnmount(() => {
@@ -148,8 +148,14 @@ onBeforeUnmount(() => {
       <div class="block">
         <div class="section-head">
           <h3>{{ $t('admin.media.stats') }}</h3>
-          <button type="button" class="btn btn-ghost btn-sm" :disabled="statsLoading" @click="loadStats">
-            {{ $t('admin.updateList') }}
+          <button
+            type="button"
+            class="btn btn-sm"
+            :class="stats ? 'btn-ghost' : 'btn-primary'"
+            :disabled="statsLoading"
+            @click="loadStats"
+          >
+            {{ stats ? $t('admin.updateList') : $t('admin.media.calculateStats') }}
           </button>
         </div>
         <LoadingIndicator v-if="statsLoading && !stats" />
@@ -158,6 +164,7 @@ onBeforeUnmount(() => {
           {{ $t('admin.media.headersOnSteam', { n: stats.steamHeaders, total: stats.headers }) }}<br />
           {{ $t('admin.media.screenshotsOnSteam', { n: stats.steamScreenshots, total: stats.screenshots }) }}
         </p>
+        <p v-else class="small muted">{{ $t('admin.media.statsHint') }}</p>
       </div>
 
       <div class="block">

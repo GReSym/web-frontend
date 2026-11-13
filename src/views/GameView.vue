@@ -168,8 +168,8 @@ function onLibrarySaved(saved: GameRating | null) {
         <div class="right">
           <div class="head">
             <div class="meta">
-              <h1 id="game-title">{{ game.title }}</h1>
-              <p v-if="developer" class="muted">{{ developer }}</p>
+              <h1 id="game-title" translate="no">{{ game.title }}</h1>
+              <p v-if="developer" class="muted" translate="no">{{ developer }}</p>
               <p class="muted">{{ released ?? $t('game.dateUnknown') }}</p>
               <a
                 v-if="game.steamAppId"
@@ -190,6 +190,12 @@ function onLibrarySaved(saved: GameRating | null) {
               >
                 {{ libraryLabel }}
               </button>
+              <RouterLink
+                :to="{ name: 'similar', params: { id: game.gameId } }"
+                class="btn btn-ghost"
+              >
+                {{ $t('game.similar') }}
+              </RouterLink>
               <template v-if="showListButtons">
                 <button
                   type="button"

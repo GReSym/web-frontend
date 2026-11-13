@@ -6,6 +6,7 @@ import { ApiError } from '@/services/api'
 import { safeRedirect } from '@/router'
 import { useAuthStore } from '@/stores/auth'
 import { useErrorMessage } from '@/composables/useErrorMessage'
+import RegisterNotice from './RegisterNotice.vue'
 
 // Login and Register are two variants of this form (same panel, fields and spacing).
 
@@ -84,6 +85,8 @@ async function submit() {
         <span class="logo">GReSym</span>
         <h1>{{ mode === 'login' ? $t('auth.signInTitle') : $t('auth.registerTitle') }}</h1>
       </div>
+
+      <RegisterNotice v-if="mode === 'register'" />
 
       <div class="field">
         <label for="auth-email">{{ $t('auth.email') }}</label>

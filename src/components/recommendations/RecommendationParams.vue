@@ -31,6 +31,7 @@ function clampLimit() {
   limit.value = Math.min(100, Math.max(3, limit.value || 3))
 }
 
+// With "ignore" the strength does nothing, so the slider is hidden (it only confused users)
 const strengthUnused = computed(() => settings.value.dislikeMode === 'ignore')
 const isRecs = computed(() => props.layout === 'recommendations')
 </script>
@@ -75,7 +76,7 @@ const isRecs = computed(() => props.layout === 'recommendations')
         </div>
       </div>
 
-      <div class="field">
+      <div v-if="!strengthUnused" class="field">
         <label :for="`${id}-str`">
           {{ $t('params.dislikeStrength') }}
           <output class="value">{{ settings.dislikeStrength }}</output>
@@ -92,7 +93,6 @@ const isRecs = computed(() => props.layout === 'recommendations')
         />
         <div class="ends small muted">
           <span>{{ $t('params.strengthLow') }}</span>
-          <span v-if="strengthUnused">{{ $t('params.strengthUnused') }}</span>
           <span>{{ $t('params.strengthHigh') }}</span>
         </div>
       </div>
