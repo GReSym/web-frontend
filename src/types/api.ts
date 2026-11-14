@@ -25,6 +25,10 @@ export interface RecommendationSettings {
   dislikeStrength: number
 }
 
+export interface UserSettings extends RecommendationSettings {
+  hideNsfw: boolean
+}
+
 export interface UserStats {
   totalHours: number
   gamesPlayed: number

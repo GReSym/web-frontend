@@ -252,6 +252,10 @@ export default {
     email: 'Email',
     settings: 'Settings',
     saveSettings: 'Save settings',
+    hideNsfw: 'Hide NSFW games',
+    saveLibraryFirst: 'Save or revert your library edits before changing this filter.',
+    hideNsfwHelp:
+      'Hide games with NSFW tags everywhere, including your library and recommendation history. Your saved games and ratings are kept.',
     settingsSaved: 'Settings saved',
     leaveConfirm: 'You have unsaved changes. Leave the page anyway?',
   },

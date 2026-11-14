@@ -42,7 +42,8 @@ const creating = ref(false)
 async function loadSettings() {
   settingsError.value = null
   try {
-    settings.value = await userService.getSettings()
+    const { mainstream, dislikeMode, dislikeStrength } = await userService.getSettings()
+    settings.value = { mainstream, dislikeMode, dislikeStrength }
     settingsLoaded.value = true
   } catch (e) {
     settingsError.value = e

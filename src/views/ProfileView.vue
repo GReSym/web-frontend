@@ -16,7 +16,7 @@ import InfiniteSentinel from '@/components/common/InfiniteSentinel.vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
-import type { RecommendationSettings } from '@/types/api'
+import type { RecommendationSettings, UserSettings } from '@/types/api'
 
 const auth = useAuthStore()
 const { t } = useI18n()
@@ -49,8 +49,8 @@ async function saveName() {
 }
 
 // ---------- Settings (recommendation defaults) ----------
-const settings = ref<RecommendationSettings | null>(null)
-const savedSettings = ref<RecommendationSettings | null>(null)
+const settings = ref<UserSettings | null>(null)
+const savedSettings = ref<UserSettings | null>(null)
 const settingsError = ref<unknown>(null)
 const savingSettings = ref(false)
 const settingsController = new AbortController()
@@ -65,17 +65,36 @@ async function loadSettings() {
     if (!isAbortError(e)) settingsError.value = e
   }
 }
+const tuning = computed<RecommendationSettings>({
+  get: () => ({
+    mainstream: settings.value!.mainstream,
+    dislikeMode: settings.value!.dislikeMode,
+    dislikeStrength: settings.value!.dislikeStrength,
+  }),
+  set: (value) => {
+    if (settings.value) settings.value = { ...settings.value, ...value }
+  },
+})
 const settingsDirty = computed(
   () => !!settings.value && JSON.stringify(settings.value) !== JSON.stringify(savedSettings.value),
 )
 
 async function saveSettings() {
   if (!settings.value) return
+  if (settings.value.hideNsfw !== savedSettings.value?.hideNsfw && library.dirtyIds.value.length) {
+    toast.error(t('profile.saveLibraryFirst'))
+    return
+  }
   savingSettings.value = true
   try {
+    const visibilityChanged = settings.value.hideNsfw !== savedSettings.value?.hideNsfw
     const s = await userService.updateSettings(settings.value)
     settings.value = { ...s }
     savedSettings.value = { ...s }
+    if (visibilityChanged) {
+      await library.reload()
+      stats.value?.reload()
+    }
     toast.success(t('profile.settingsSaved'))
   } catch (e) {
     toast.error(errorMessage(e))
@@ -180,12 +199,21 @@ onBeforeUnmount(() => {
       </div>
       <div class="panel">
         <ErrorMessage v-if="settingsError" :error="settingsError" retryable @retry="loadSettings" />
-        <RecommendationParams
-          v-else-if="settings"
-          v-model="settings"
-          layout="profile"
-          :disabled="savingSettings"
-        />
+        <template v-else-if="settings">
+          <label class="nsfw-setting">
+            <input
+              v-model="settings.hideNsfw"
+              type="checkbox"
+              :disabled="savingSettings || library.dirtyIds.value.length > 0"
+            />
+            {{ $t('profile.hideNsfw') }}
+          </label>
+          <p class="nsfw-help">{{ $t('profile.hideNsfwHelp') }}</p>
+          <p v-if="library.dirtyIds.value.length" class="nsfw-help">
+            {{ $t('profile.saveLibraryFirst') }}
+          </p>
+          <RecommendationParams v-model="tuning" layout="profile" :disabled="savingSettings" />
+        </template>
         <LoadingIndicator v-else />
       </div>
     </section>
@@ -252,6 +280,15 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.nsfw-setting {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nsfw-help {
+  margin: 0.5rem 0 1.5rem;
+  color: var(--text-muted);
+}
 .profile {
   max-width: var(--w-profile);
 }
